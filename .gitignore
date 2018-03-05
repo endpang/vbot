@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 composer.phar
 /vendor/
 /.idea
@@ -6,3 +7,10 @@ composer.lock
 # Commit your application's lock file http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file
 # You may choose to ignore a library lock file http://getcomposer.org/doc/02-libraries.md#lock-file
 # composer.lock
+=======
+/vendor/
+.idea
+/tmp/
+composer.lock
+sandbox
+>>>>>>> 67f8ce7981b57a2781940882331821c00a73cabe
