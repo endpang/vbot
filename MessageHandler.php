@@ -8,6 +8,7 @@ use Hanson\MyVbot\Handlers\Contact\FeedbackGroup;
 use Hanson\MyVbot\Handlers\Contact\Hanson;
 use Hanson\MyVbot\Handlers\Type\RecallType;
 use Hanson\MyVbot\Handlers\Type\TextType;
+use Hanson\Vbot\Message\Image;
 use Hanson\Vbot\Contact\Friends;
 use Hanson\Vbot\Contact\Groups;
 use Hanson\Vbot\Contact\Members;
@@ -59,5 +60,76 @@ class MessageHandler
                 $friends->approve($message);
             }
         }
+        //print_r($message);
+        $re = 0;
+        if($message["fromType"] == "Friend"){
+            $nick = $message['from']['NickName'];
+            $re = 1;
+        }
+
+        if($message["fromType"] == "Group"){
+            $nick = $message['sender']['NickName'];
+            if(@$message['isAt']){
+                $re = 1;
+            }
+        }
+        if($re ==1 ){
+
+            $zi = mb_substr($message["message"],0,1,'utf-8');
+            $uni = self::unicode_encode($zi);
+
+
+            $var = trim($uni);
+            $len = strlen($var)-1;
+            $las = $var{$len};
+            $url = "http://www.shufaji.com/datafile/bd/gif/".$las."/".$uni.".gif";
+            //Text::send($message['from']['UserName'], "@".$nick." ".$url);
+            if(!is_file(__DIR__."/img/".$uni.'.gif')){
+
+                $img = @file_get_contents($url);
+
+                if(!empty($img)){
+                    file_put_contents(__DIR__."/img/".$uni.'.gif',$img);
+                    Emoticon::send($message['from']['UserName'], __DIR__."/img/".$uni.".gif");
+
+                }else{
+                    Text::send($message['from']['UserName'], "@".$nick." 找不到这个字的笔顺".$url);
+                }
+            }else{
+                Emoticon::send($message['from']['UserName'], __DIR__."/img/".$uni.".gif");
+            }
+        }
+
+
+    }
+    private static function unicode_encode($name)
+    {
+        $name = iconv('UTF-8', 'UCS-2', $name);
+        $len = strlen($name);
+        $str = '';
+        for ($i = 0; $i < $len - 1; $i = $i + 2)
+        {
+            $c = $name[$i];
+            $c2 = $name[$i + 1];
+            if (ord($c) > 0)
+            {    // 两个字节的文字
+                $s1 = base_convert(ord($c), 10, 16);
+                $s2 = base_convert(ord($c2), 10, 16);
+
+                if(ord($c) < 16){
+                    $s1 = "0".$s1;
+                }
+                if(ord($c2) < 16){
+                    $s2 = "0".$s2;
+                }
+                $str .= $s1 . $s2;
+            }
+            else
+            {
+                $str .= $c2;
+            }
+
+        }
+        return $str;
     }
 }
